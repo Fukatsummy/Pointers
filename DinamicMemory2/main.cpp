@@ -35,7 +35,6 @@ void main()
 	n++;
 	*/
 }
-
 void FillRand(int arr[], const int n)
 {
 	for (int i = 0; i < n; i++)
