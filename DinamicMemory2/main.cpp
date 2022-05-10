@@ -18,16 +18,18 @@ int* pop_back(int arr[], int&n);
 int* pop_front(int arr[], int&n);
 int* erase(int arr[], int&n, int value, int index);
 int**Allocate(const int rows, const int cols);
-int** clear(int** arr, const int rows, const int cols);
+template<typename T>T** clear(T** arr, const int rows, const int cols);
+//void**Insert_row(int**arr, int&rows, const int cols, int index);
 int**push_row_back(int** arr, int& rows, int& cols);
 int**push_row_front(int** arr, int& rows, const int cols);
 int**Erase_row(int** arr, int& rows, const int cols, int index);
 int** pop_row_back(int** arr, int&rows, const int cols);
+void Insert_col(int** arr, const int rows, int&cols, int index);
 void pop_col_back(int**arr, const int rows, int&cols);
 void pop_col_front(int**arr, const int rows, int&cols);
 void push_col_back(int** arr, const int rows, int& cols);
 void push_col_front(int**arr, const int rows, int&cols);
-
+int**Erase_col(int** arr, const int rows, int&cols, int index);
 //#define DYNAMIC_MEMORY1
 #define DYNAMIC_MEMORY2
 
@@ -96,7 +98,8 @@ void main()
 #ifdef DYNAMIC_MEMORY2
 	int rows;//количество строк двумерного динамического массива
 	int cols;//количество элементов строки
-
+    int index;
+	//int value;
 	cout << "Введите количество строк: "; cin >> rows;
 	cout << "Введите количество элементов строки: "; cin >> cols;
 
@@ -104,6 +107,10 @@ void main()
 	int** arr = Allocate(rows, cols);
 	FillRand(arr, rows, cols);
 	Print(arr, rows, cols);
+	/*cout << delimiter << endl;
+	cout << "Вставляет строку "; 
+	Insert_row(arr, rows, cols, index);
+	Print(arr, rows, cols);*/
 	cout << delimiter << endl;
 	cout << " Добавление строки в конец:\n";
 	arr = push_row_back(arr, rows, cols);//удаляет последний ряд
@@ -114,14 +121,17 @@ void main()
 	Print(arr, rows, cols);
 	cout << delimiter << endl;
 	//int value;
-	int index;
-	//cout << "Введите значение: "; cin >> value;
+	
 	cout << "Введите индекс: "; cin >> index;
 	arr = Erase_row(arr, rows, cols, index);
 	Print(arr, rows, cols);
 	cout << delimiter << endl;
 	cout << "Удаляет строку с конца массива:\n ";
 	arr = pop_row_back(arr, rows, cols);
+	Print(arr, rows, cols);
+	cout << delimiter << endl;
+	cout << "вставляет столбик: \n";
+	Insert_col(arr, rows, cols, index);
 	Print(arr, rows, cols);
 	cout << delimiter << endl;
 	cout << "Удаляет строку с конца массива:\n";
@@ -140,6 +150,9 @@ void main()
 	push_col_front(arr, rows, cols);
 	Print(arr, rows, cols);
 	cout << delimiter << endl;
+	cout << "Удаляет столбец из массива по указанному индексу: "; cin >> index;
+	arr = Erase_col(arr, rows, cols, index);
+	Print(arr, rows, cols);
 	clear(arr, rows, cols);
 #endif // DYNAMIC_MEMORY2
 
@@ -212,9 +225,9 @@ int* insert(int arr[], int&n, int value, int index)
 {
 	int*buffer = new int[n + 1];
 	for (int i = n - 1; i >= index - 1; i--)	buffer[i + 1] = arr[i];
-	for (int i = 0; i <= index - 1; i++)buffer[i] = arr[i];
+	for (int i = 0; i <= index; i++)buffer[i] = arr[i];
 	delete[]arr;
-	buffer[index] = value;
+	*arr=buffer[index];
 	arr = buffer;
 	n++;
 	return arr;
@@ -266,9 +279,30 @@ int** clear(int** arr, const int rows, const int cols)
 		delete[] arr[i];
 	}
 	//4.2 Удаляем массив указателей
-
 	return arr;
 }
+//void**Insert_row(int**arr, int&rows, const int cols, int index)
+//{
+//	//int**buffer = new int*[rows + 1];
+//	//for (int i = 0; i < index; i++)buffer[i] = arr[i];
+//	//for (int i = index; i <=rows; i++)buffer[i+1] = arr[i];
+//	//delete[] arr; 
+//	//arr=buffer;
+//	//arr[index] = new int[rows] {};
+//	//rows++;
+//	////return ;
+//	for (int i = 0; i < cols; i++)
+//	{
+//		int* buffer = new int[rows + 1]{};
+//		for (int j = 0; j < index; j++)
+//			buffer[i] = arr[i][j];
+//		for (int j = index; j < rows; j++)
+//			buffer[j + 1] = arr[i][j];
+//		delete[] arr[i];
+//		arr[i] = buffer;
+//	}
+//	rows++;
+//}
 int**push_row_back(int** arr, int& rows, int& cols)
 {
 	int**buffer = new int*[rows + 1]{};
@@ -324,6 +358,20 @@ int** pop_row_back(int** arr, int&rows, const int cols)
 	delete[] arr;
 	return buffer;
 }
+void Insert_col(int** arr, const int rows, int&cols, int index)
+{
+	for (int i = 0; i < rows; i++)
+	{
+		int*  buffer = new int[cols + 1]{};
+		for (int j = 0; j < index; j++)
+			buffer[j] = arr[i][j];
+		for (int j = index; j < cols; j++)
+			buffer[j + 1] = arr[i][j];
+		delete[] arr[i];
+		arr[i] = buffer;
+	}
+	cols++;
+}
 void pop_col_back(int**arr, const int rows, int&cols)
 {
 	for (int i = 0; i < rows; i++)
@@ -345,14 +393,11 @@ void pop_col_front(int**arr, const int rows, int&cols)
 		for (int j = 0; j < cols; j++)
 			buffer[j] = arr[i][j + 1];
 		delete[] arr[i];
-		//buffer[0] = new int[rows];
 		arr[i] = buffer;
-		//cols--;
 	}
 }
 void push_col_back(int** arr, const int rows, int& cols)
 {
-	//int**buffer = new int*[cols+1]{};
 	for (int i = 0; i < rows; i++)
 	{
 		int* buffer = new int[cols + 1]{};
@@ -362,7 +407,6 @@ void push_col_back(int** arr, const int rows, int& cols)
 		arr[i] = buffer;
 	}
 	cols++;
-	//return buffer;
 }
 void push_col_front(int**arr, const int rows, int&cols)
 {
@@ -374,4 +418,25 @@ void push_col_front(int**arr, const int rows, int&cols)
 		delete[]arr[i];
 		arr[i] = buffer;
 	}cols++;
+}
+int**Erase_col(int** arr, const int rows, int& cols, int index)//Удаляет столбец из массива по указанному индексу
+{
+	/*--cols;
+	int**buffer = new int*[cols] {};
+	for (int i = 0; i < index; i++)buffer[i] = arr[i];
+	for (int i = index; i < cols; i++)buffer[i] = arr[i + 1];
+	delete[]arr[index];
+	delete[] arr;
+	return buffer;*/
+	for (int i = 0; i < index; i++)
+	{
+		int**buffer = new int*[cols - 1];
+		for (int j = index; j < cols; j++)
+		
+			*buffer[index] = arr[i][j];
+			delete[]arr[i];
+			arr[i] = *buffer;
+		return buffer;
+	}
+	cols--;
 }
